@@ -19,17 +19,20 @@ namespace InventorCOM
             DrawingSketch sketch = sheet.Sketches.Add();
             InventorPlotter plotter = new InventorPlotter(sketch);
             plotter.ImportData(@"C:\Users\Artem\Desktop\test.csv");
-            plotter.LocatePlot(5, 5);
+            plotter.LocatePlot(10, 10);
+            plotter.AddColor(255, 0, 0);
             plotter.PlotPieceWise();
             plotter.PlotAxisLines();
             plotter.SetPlotName("Пробный график");
             plotter.PlotXGrid(0, 0.5f);
             plotter.PlotXTicks(0, 0.5f, scale:2);
-            plotter.PlotYGrid(0, 0.5f);
+            plotter.PlotYGrid(0, 5f);
             plotter.PlotYTicks(0, 5f, scale:2);
             plotter.PlotYTicks(0, 5f, scale: 4, transverseOffset: 1);
             plotter.LabelXAxis("\u03C7 label");
-            plotter.LabelYAxis("\u03B3 label", position: "top");
+            plotter.LabelYAxis("\u03B3 label", position: "top", transverseCorrection: 2);
+
+            /*
             plotter.DrawXArrow(traverseOffset: 3);
             plotter.DrawYArrow(traverseOffset: 2);
 
