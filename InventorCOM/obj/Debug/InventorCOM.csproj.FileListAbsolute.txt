@@ -1,0 +1,22 @@
+c:\users\workshop\documents\visual studio 2015\Projects\InventorCOM\InventorCOM\bin\Debug\InventorCOM.exe
+C:\Users\Workshop\Documents\Visual Studio 2015\Projects\InventorCOM\InventorCOM\bin\Debug\InventorCOM.exe.config
+C:\Users\Workshop\Documents\Visual Studio 2015\Projects\InventorCOM\InventorCOM\obj\Debug\InventorCOM.csproj.ResolveComReference.cache
+C:\Users\Workshop\Documents\Visual Studio 2015\Projects\InventorCOM\InventorCOM\obj\Debug\InventorCOM.exe
+C:\Users\Workshop\Documents\Visual Studio 2015\Projects\InventorCOM\InventorCOM\obj\Debug\InventorCOM.pdb
+C:\Users\Workshop\documents\visual studio 2015\Projects\InventorCOM\InventorCOM\obj\Debug\InventorCOM.csprojResolveAssemblyReference.cache
+C:\Users\Workshop\documents\visual studio 2015\Projects\InventorCOM\InventorCOM\bin\Debug\InventorCOM.pdb
+C:\Users\Клюквина Татьяна\Documents\Visual Studio 2015\Projects\InventorCOM\InventorCOM\bin\Debug\InventorCOM.exe.config
+C:\Users\Клюквина Татьяна\Documents\Visual Studio 2015\Projects\InventorCOM\InventorCOM\obj\Debug\InventorCOM.csproj.ResolveComReference.cache
+C:\Users\Клюквина Татьяна\Documents\Visual Studio 2015\Projects\InventorCOM\InventorCOM\obj\Debug\InventorCOM.exe
+C:\Users\Клюквина Татьяна\Documents\Visual Studio 2015\Projects\InventorCOM\InventorCOM\obj\Debug\InventorCOM.pdb
+C:\Users\Клюквина Татьяна\Documents\Visual Studio 2015\Projects\InventorCOM\InventorCOM\bin\Debug\InventorCOM.exe
+C:\Users\Клюквина Татьяна\Documents\Visual Studio 2015\Projects\InventorCOM\InventorCOM\bin\Debug\InventorCOM.pdb
+C:\Users\Клюквина Татьяна\Documents\Visual Studio 2015\Projects\InventorCOM\InventorCOM\obj\Debug\InventorCOM.csprojResolveAssemblyReference.cache
+C:\Users\Artem\Documents\Visual Studio 2017\InventorCOM\InventorCOM\bin\Debug\InventorCOM.exe.config
+C:\Users\Artem\Documents\Visual Studio 2017\InventorCOM\InventorCOM\bin\Debug\InventorCOM.exe
+C:\Users\Artem\Documents\Visual Studio 2017\InventorCOM\InventorCOM\bin\Debug\InventorCOM.pdb
+C:\Users\Artem\Documents\Visual Studio 2017\InventorCOM\InventorCOM\obj\Debug\InventorCOM.csprojResolveAssemblyReference.cache
+C:\Users\Artem\Documents\Visual Studio 2017\InventorCOM\InventorCOM\obj\Debug\InventorCOM.csproj.ResolveComReference.cache
+C:\Users\Artem\Documents\Visual Studio 2017\InventorCOM\InventorCOM\obj\Debug\InventorCOM.csproj.CoreCompileInputs.cache
+C:\Users\Artem\Documents\Visual Studio 2017\InventorCOM\InventorCOM\obj\Debug\InventorCOM.exe
+C:\Users\Artem\Documents\Visual Studio 2017\InventorCOM\InventorCOM\obj\Debug\InventorCOM.pdb
