@@ -40,6 +40,8 @@ namespace InventorCOM
         private List<Color> colors;
 
         private float xMin, xMax, yMin, yMax;
+        private bool xlimManual, ylimManual;
+
         private float yScale;
         private float xScale;
 
@@ -52,9 +54,11 @@ namespace InventorCOM
             this.initY = 0;
             this.length = 9;
             this.height = 6;
-            this.xConverter = x => (x).ToString();
-            this.yConverter = y => (y).ToString();
+            this.xConverter = x => string.Format("{0:0}", x);
+            this.yConverter = y => string.Format("{0:0}", y);
             colors = new List<Color>();
+            xlimManual = false;
+            ylimManual = false;
         }
 
         public void ImportData(string path) {
@@ -115,6 +119,21 @@ namespace InventorCOM
             UpdateInternals();
         }
 
+        public void SetXLim(float xMin, float xMax) {
+            this.xMin = xMin;
+            this.xMax = xMax;            
+            xlimManual = true;
+            UpdateInternals();
+        }
+
+        public void SetYLim(float yMin, float yMax)
+        {
+            this.yMin = yMin;
+            this.yMax = yMax;            
+            ylimManual = true;
+            UpdateInternals();
+        }
+
         public void PlotAxisLines(float xOffsetLeft = 0, float xOffsetRight = 0, float yOffsetBottom = 0, float yOffsetTop = 0, bool isRectangle = true, float lineWeight = 0.01f)
         {
             //построение обоих осей
@@ -124,12 +143,6 @@ namespace InventorCOM
             //yOffsetTop -                              вверх
             //isRectangle - сетка углом или прямоугольником. По умолчанию стоит прямоугольник
             //lineWeight - толщина линии осей
-
-            xMin += this.initX - xOffsetLeft;
-            xMax += this.initX + xOffsetRight;
-
-            yMin += this.initY - yOffsetBottom;
-            yMax += this.initY + yOffsetTop;
 
             this.leftBottom = transGeom.CreatePoint2d(ToPlotCoordX(xMin), ToPlotCoordY(yMin));
             this.rightBottom = transGeom.CreatePoint2d(ToPlotCoordX(xMax), ToPlotCoordY(yMin));
@@ -222,11 +235,11 @@ namespace InventorCOM
             //longwiseCorrection - величина, на которую можно сместить текст вдоль оси х
             List<float> longwiseOffsets = new List<float>();
             List<TextBox> labels = new List<TextBox>();
-            TickConverterDelegate localConverter = x => string.Format("<StyleOverride FontSize='{0}'>{1}</StyleOverride>", fontSize, this.xConverter(x / xScale * scale));
+            TickConverterDelegate localConverter = x => string.Format("<StyleOverride FontSize='{0}'>{1}</StyleOverride>", fontSize, this.xConverter(x));
 
             this.sketch.Edit();
 
-            for (float value = originValue; value * xScale < length; value += step)
+            for (float value = originValue; value * xScale <= length; value += step)
             {
                 longwiseOffsets.Add(value * xScale);
             }
@@ -234,22 +247,22 @@ namespace InventorCOM
             foreach (float longwiseOffset in longwiseOffsets) {
                 Point2d textPos = transGeom.CreatePoint2d(longwiseOffset + initX - longwiseCorrection, initY - transverseOffset);
                 TextBox label = this.sketch.TextBoxes.AddFitted(textPos, localConverter(longwiseOffset));
-                label.FormattedText = localConverter(longwiseOffset);
+                label.FormattedText = localConverter(longwiseOffset / xScale + xMin);
                 label.Style.VerticalJustification = VerticalTextAlignmentEnum.kAlignTextUpper;
                 label.Style.HorizontalJustification = HorizontalTextAlignmentEnum.kAlignTextCenter;
             }
             this.sketch.ExitEdit();
         }
 
-        public void PlotYTicks(float originValue, float step, float transverseOffset = 0.3f, float fontSize = 0.3f, float longwiseCorrection = 0.15f, float scale = 1)
+        public void PlotYTicks(float originValue, float step, float transverseOffset = 0.3f, float fontSize = 0.3f, float longwiseCorrection = 0.15f, float scale = 1, String format = ":0")
         {
             List<float> longwiseOffsets = new List<float>();
             List<TextBox> labels = new List<TextBox>();
-            TickConverterDelegate localConverter = y => string.Format("<StyleOverride FontSize='{0}'>{1}</StyleOverride>", fontSize, this.yConverter(y / yScale * scale));
+            TickConverterDelegate localConverter = y => string.Format("<StyleOverride FontSize='{0}'>{1" + format + "}</StyleOverride>", fontSize, y);
 
 
             this.sketch.Edit();
-            for (float value = originValue; value * yScale < height; value += step)
+            for (float value = originValue; value * yScale <= height; value += step)
             {
                 longwiseOffsets.Add(value * yScale);
             }
@@ -258,7 +271,7 @@ namespace InventorCOM
             {
                 Point2d textPos = transGeom.CreatePoint2d(initX - transverseOffset, longwiseOffset + initY + longwiseCorrection);
                 TextBox label = this.sketch.TextBoxes.AddFitted(textPos, localConverter(longwiseOffset));
-                label.FormattedText = localConverter(longwiseOffset);
+                label.FormattedText = localConverter(longwiseOffset / yScale + yMin);
             }
             this.sketch.ExitEdit();
         }
@@ -437,7 +450,12 @@ namespace InventorCOM
             List<SketchLine> plotLines = new List<SketchLine>();
             for (int i = 0; i != pointArray.GetLength(0) - 1; ++i)
             {
-                plotLines.Add(sketch.SketchLines.AddByTwoPoints(pointArray[i], pointArray[i + 1]));
+                try
+                {
+                    plotLines.Add(sketch.SketchLines.AddByTwoPoints(pointArray[i], pointArray[i + 1]));
+                }
+                catch (System.Runtime.InteropServices.COMException e) { }
+                
             }
 
             foreach (SketchLine line in plotLines) {
@@ -466,18 +484,22 @@ namespace InventorCOM
         }
 
         private void UpdateInternals() {
-            xMin = xArray.Min(); ;
-            xMax = xArray.Max();
-
-            yMin = this.yArrays[0].Min();
-            yMax = this.yArrays[0].Max();
-
-            foreach (float[] vect in this.yArrays)
-            {
-                yMax = vect.Max() > yMax ? vect.Max() : yMax;
-                yMin = vect.Min() < yMin ? vect.Min() : yMin;
+            if (!xlimManual) {
+                xMin = xArray.Min();
+                xMax = xArray.Max();
             }
 
+            if (!ylimManual) {
+                yMin = this.yArrays[0].Min();
+                yMax = this.yArrays[0].Max();
+
+                foreach (float[] vect in this.yArrays)
+                {
+                    yMax = vect.Max() > yMax ? vect.Max() : yMax;
+                    yMin = vect.Min() < yMin ? vect.Min() : yMin;
+                }
+            }
+        
             SetXScale();
             SetYScale();
         }

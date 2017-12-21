@@ -11,46 +11,82 @@ namespace InventorCOM
 {
     class Tester
     {
+        // перед использованием программы необходимо создать в инвенторе документ и открыть лист, на котором ты собираешься рисовать графики 
         static void Main(string[] args)
-        {
+        {   
+            // обертка над API инвентора
             InventorManager test = new InventorManager();
+            // получаем открытый документ
             DrawingDocument doc = (DrawingDocument)test.App.ActiveDocument;
+            // получаем открытую страницу
             Sheet sheet = doc.ActiveSheet;
-            DrawingSketch sketch = sheet.Sketches.Add();
-            InventorPlotter plotter = new InventorPlotter(sketch);
-            plotter.ImportData(@"C:\Users\Artem\Desktop\test.csv");
-            plotter.LocatePlot(10, 10);
+            
+            // этот график откомментирую ниже, так как он сложнее. в нем я использовал практически все возможности программы
+            PlotTemperatureProfile(
+                    @"C:\Users\Artem\Desktop\cooling_t_complex.csv", "Температуры", 32, sheet
+            );
+            
+            PlotEfficiencyProfile(
+                    @"C:\Users\Artem\Desktop\cooling_t_efficiency.csv", "Эффективность", 8, sheet
+            );
+        }
+
+        static void PlotTemperatureProfile(String dataPath, String plotName, float yPos, Sheet sheet) {
+            // получить графопостроитель. вызов sheet.Sketches.Add() создает на листе новый эскиз. хранить его в отдельной переменной
+            // особого смысла нет, так напрямую с ним работа не ведется.
+            InventorPlotter plotter = new InventorPlotter(sheet.Sketches.Add());
+            // загрузить данные: передается строка с абсолютным путем до данных в формате csv с запятой в качестве разделителя между числам
+            // шапки в файле с данными быть не должно
+            plotter.ImportData(dataPath);
+            // задается минимальное и максимальное значение y , на которое будет распространяться график
+            // есть аналогичная функция SetXLim
+            plotter.SetYLim(500, 1450);
+            // задается положение левого нижнего угла графика относительно левого нижнего угла листа в сантиметрах
+            plotter.LocatePlot(5, yPos);
+            // задается размер прямоугольника, в который будет вписан график. сначала ширина, затем высота
+            plotter.SetPlotSize(35, 20);
+
+            // функция AddColor добавляет цвет в список цветов. цвета будут использованы в порядке добавления при построении графиков
+            // если цвета закончились, графики будут построены черным цветом
             plotter.AddColor(255, 0, 0);
-            plotter.PlotPieceWise();
+            plotter.AddColor(0, 255, 0);
+            plotter.AddColor(0, 0, 255);
+
+            // функция строит график с заданной толщиной линии. строятся сразу все графики
+            plotter.PlotPieceWise(lineWeight: 0.05f);
+            // строятся осевые линии
             plotter.PlotAxisLines();
-            plotter.SetPlotName("Пробный график");
-            plotter.PlotXGrid(0, 0.5f);
-            plotter.PlotXTicks(0, 0.5f, scale:2);
-            plotter.PlotYGrid(0, 5f);
-            plotter.PlotYTicks(0, 5f, scale:2);
-            plotter.PlotYTicks(0, 5f, scale: 4, transverseOffset: 1);
-            plotter.LabelXAxis("\u03C7 label");
-            plotter.LabelYAxis("\u03B3 label", position: "top", transverseCorrection: 2);
+            // задается имя эскиза, на котором строится график. если эскиз с таким именем уже существует, программа упадет
+            plotter.SetPlotName(plotName);
+            // построить линии сетки, перпендикулярные оси x. первым аргументом передается начальное значение, на котором будет построена сетка, вторым - 
+            // шаг сетки (не помню, почему почему у меня в качестве начального значения стоит 6)
+            plotter.PlotXGrid(6, 10f);
+            // сделать подписи к графику по оси x. первые 2 аргумента те же, что и в предыдущей функции, затем идет размер шрифта и смещение в направлении от оси
+            // список остальных аргументов можешь посмотреть в определении функции
+            plotter.PlotXTicks(6, 10f, fontSize: 0.6f, transverseOffset: 0.3f);
+            // то же самое, что и для x
+            plotter.PlotYGrid(0, 100f);
+            // то же самое, что и для x. longwiseCorrection - смещение подписи вдоль оси ввверх
+            plotter.PlotYTicks(0, 100f, fontSize: 0.6f, transverseOffset: 1f, longwiseCorrection:0.3f);
+        }
 
-            /*
-            plotter.DrawXArrow(traverseOffset: 3);
-            plotter.DrawYArrow(traverseOffset: 2);
+        static void PlotEfficiencyProfile(String dataPath, String plotName, float yPos, Sheet sheet)
+        {
+            InventorPlotter plotter = new InventorPlotter(sheet.Sketches.Add());
+            plotter.ImportData(dataPath);
+            plotter.SetYLim(0.0f, 1);
+            plotter.LocatePlot(5, yPos);
+            plotter.SetPlotSize(35, 20);
 
-            /*
-            plotter.ImportData(@"C:\Users\Клюквина Татьяна\Desktop\test plotter\Массивы\еуые.csv");
-            plotter.LocatePlot(5, 5);
-            plotter.PlotPieceWise();
-            plotter.PlotAxisLines(yOffsetTop:1);
-            plotter.SetPlotName("Пробный график");
-            plotter.PlotXGrid(0, 0.5f);
-            plotter.PlotYGrid(0, 0.5f);
-            plotter.PlotXTicks(0, 1f);
-            plotter.PlotYTicks(0, 1f);
-            plotter.LabelXAxis("\u039B");
-            plotter.LabelYAxis("\u03A3", position: "top");
-            plotter.DrawXArrow(traverseOffset: 3);
-            plotter.DrawYArrow(traverseOffset: 2);
-            */
+            plotter.AddColor(0, 0, 255);
+
+            plotter.PlotPieceWise(lineWeight: 0.05f);
+            plotter.PlotAxisLines();
+            plotter.SetPlotName(plotName);
+            plotter.PlotXGrid(6, 10f);
+            plotter.PlotXTicks(6, 10f, fontSize: 0.6f, transverseOffset: 0.3f);
+            plotter.PlotYGrid(0, 0.1f);
+            plotter.PlotYTicks(0, 0.1f, fontSize: 0.6f, transverseOffset: 1f, longwiseCorrection: 0.3f, format:":0.0");
         }
     }
 }
